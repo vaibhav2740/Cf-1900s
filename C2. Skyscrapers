@@ -1,0 +1,62 @@
+#include<bits/stdc++.h>
+using namespace std;
+using ll = long long;
+
+vector<ll> PSE(vector<ll>&v){
+    int n = v.size();
+    vector<ll>res(n,-1);
+    stack<int>stk;
+    for(int i=0;i<n;i++){
+        while(!stk.empty()&&v[stk.top()]>=v[i]) stk.pop();
+        if(!stk.empty()) res[i] = stk.top();
+        stk.push(i);
+    }
+    return res;
+}
+ 
+vector<ll> NSE(vector<ll>&v){
+    int n = v.size();
+    vector<ll>res(n,-1);
+    stack<int>stk;
+    for(int i=n-1;i>=0;i--){
+        while(!stk.empty()&&v[stk.top()]>=v[i]) stk.pop();
+        if(!stk.empty()) res[i] = stk.top();
+        stk.push(i);
+    }
+    return res;
+}
+ 
+// A good mix of pattern finding -> inc then dec + use of stacks in pse/nse and precomputation.
+ 
+int main() {
+    ios::sync_with_stdio(0); cin.tie(0);
+    int n; cin>>n;
+    vector<ll>v(n);
+    for(int i=0;i<n;i++) cin>>v[i];
+    int id = 0; ll val = 0; 
+    vector<ll>pse = PSE(v); vector<ll>nse = NSE(v);  // pse, nse using stacks in O(n).
+    vector<ll>p(n); vector<ll>s(n); 
+    for(int i=0;i<n;i++){
+        if(pse[i]==-1) p[i] = (i+1)*v[i];   // montonically inc values from 0 -> i
+        else p[i] = (i-pse[i])*v[i] + p[pse[i]];
+    }
+    for(int i=n-1;i>=0;i--){                // montonically inc values from i -> n-1
+        if(nse[i]==-1) s[i] = (n-i)*v[i];
+        else s[i] = (nse[i]-i)*v[i] + s[nse[i]];
+    }
+    for(int i=1;i<n;i++){                   // Checking for each index as optimal local maximum
+        ll tmp = p[i-1] + s[i];
+        if(tmp>val){
+            val=tmp; id = i-1;
+        }
+    }
+    ll vl = v[id];                          // Reforming the final answer
+    for(int i=id;i>=0;i--){
+        v[i] = min(vl,v[i]); vl = min(vl,v[i]);
+    }
+    vl = v[id+1];
+    for(int i=id+1;i<n;i++){
+        v[i] = min(vl,v[i]); vl = min(vl,v[i]);
+    }
+    for(ll x:v) cout<<x<<" ";
+}

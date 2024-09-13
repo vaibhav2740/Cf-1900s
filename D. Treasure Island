@@ -1,0 +1,48 @@
+#include<bits/stdc++.h>
+using namespace std;
+const int N = 1e6+10;
+using ll = long long;
+ 
+int vis[N];
+ 
+bool check(vector<vector<char>>&v,int i, int j){
+    int n = v.size(); int m = v[0].size();
+    if(i>=n||i<0||j>=m||j<0||v[i][j]=='#') return 0;
+    return 1;
+}
+ 
+bool path(vector<vector<char>>&v,int i, int j){
+    int n = v.size(); int m = v[0].size();
+    if(vis[i*m+j]) return 0;
+    if(i==n-1&&j==m-1) return 1;
+    vis[i*m+j] = 1;
+    if(check(v,i+1,j)&&path(v,i+1,j)) return 1;
+    if(check(v,i,j+1)&&path(v,i,j+1)) return 1;
+    vis[i*m+j] = 2;
+    return 0; 
+}
+ 
+bool path2(vector<vector<char>>&v,int i, int j){
+    int n = v.size(); int m = v[0].size();
+    if(vis[i*m+j]==1) return 0;
+    if(i==n-1&&j==m-1) return 1;
+    vis[i*m+j] = 1;
+    if(check(v,i+1,j)&&path(v,i+1,j)) return 1;
+    if(check(v,i,j+1)&&path(v,i,j+1)) return 1;
+    return 0; 
+}
+ 
+int main() {
+    ios::sync_with_stdio(0); cin.tie(0);
+    int n,m; cin>>n>>m;
+    vector<vector<char>>v(n,vector<char>(m));
+    for(int i=0;i<n;i++){
+        for(int j=0;j<m;j++) cin>>v[i][j];
+    }
+    if(!path(v,0,0)) cout<<0<<'\n';
+    else{
+        vis[n*m-1] = 0; vis[0] = 0;
+        if(path2(v,0,0)) cout<<2<<'\n';
+        else cout<<1<<'\n';
+    }
+}
